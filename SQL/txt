@@ -1,0 +1,4 @@
+ CREATE VIEW fruits (frname, frflavor)
+              AS SELECT Foods.name, Foods.flavor
+              FROM Foods
+              WHERE Foods.type = "fruit"

@@ -1,53 +1,145 @@
-#include <stdio.h>
-#include <string.h>
+/* initialization information */
+static int init;
 #include <stdlib.h>
-#define NSYMS 20 /* maximum number of symbols */
-//void yyerror(char *s);
-struct symtab
+#include <curses.h>
+#include <sys/signal.h>
+#include <ctype.h>
+#include "y.tab1.h"
+int casecmp(char *p, char *q);
+void menu_cleanup();
+void menu_init();
+struct item* menu_runtime(struct item *items);
+
+/* structure used to store menu items */
+struct item
 {
-    char *name;
-    int value;
-} table[NSYMS];
-struct symtab *symlook(char *s);
-int main()
-{
-    for (size_t i = 0; i < 3; i++)
-    {
-        char name[20];
-        int value;
-        printf("enter variable name: \n");
-        scanf("%s", name);
-        printf("enter value: \n");
-        scanf("%d", &value);
-        struct symtab *st = symlook(name);
-        st->value = value;
-    }
-    struct symtab* sp;
-    for (sp = table; sp < &table[NSYMS] && sp->name != NULL; sp++)
-    {
-        printf("name = %s and value = %d\n", sp->name, sp->value);
-    }
-    
-   
-    return 0;
+    char *desc;
+    char *cmd;
+    int action;
+    char *act_str;     /* execute string */
+    int (*act_menu)(); /* call appropriate function */
+    int attribute;
 }
-struct symtab *symlook(char *s)
+/* screen first */
+menu_first()
 {
-    char *p;
-    struct symtab *sp;
-    for (sp = table; sp < &table[NSYMS]; sp++)
+    extern struct item menu_first_items[];
+    if (!init)
+        menu_init();
+    clear();
+    refresh();
+    move(0, 37);
+    addstr("First");
+    refresh();
+    menu_runtime(menu_first_items);
+}
+/* end first */
+struct item menu_first_items[] = {
+    {"dummy line", "dummy", 269, "", 0, 271},
+    {"run shell", "shell", 265, "/bin/sh", 0, 271},
+    {(char *)0, (char *)0, 0, (char *)0, 0, 0},
+};
+void menu_init()
+{
+     menu_cleanup();
+    signal(SIGINT, menu_cleanup);
+    initscr();
+    crmode();
+}
+void menu_cleanup()
+{
+    mvcur(0, COLS - 1, LINES - 1, 0);
+    endwin();
+}
+/* screen second */
+menu_second()
+{
+    extern struct item menu_second_items[];
+    if (!init)
+        menu_init();
+    clear();
+    refresh();
+    move(0, 37);
+    addstr("Second");
+    refresh();
+    menu_runtime(menu_second_items);
+}
+/* end second */
+struct item menu_second_items[] = {
+    {"exit program", "exit", 268, "", 0, 272},
+    {"other menu", "first", 267, "", menu_first, 271},
+    {(char *)0, (char *)0, 0, (char *)0, 0, 0},
+};
+/* runtime */
+struct item* menu_runtime(struct item *items)
+{
+    int visible = 0;
+    int choice = 0;
+    struct item *ptr;
+    char buf[BUFSIZ];
+    for (ptr = items; ptr->desc != 0; ptr++)
     {
-        /* is it already here? */
-        if (sp->name && !strcmp(sp->name, s))
-            return sp;
-        /* is it free */
-        if (!sp->name)
+        addch('\n'); /* skip a line */
+        if (ptr->attribute == VISIBLE)
         {
-            sp->name = strdup(s);
-            return sp;
+            visible++;
+            printw("\t%d) %s", visible, ptr->desc);
         }
-        /* otherwise continue to next */
     }
-   // yyerror("Too many symbols");
-    exit(1); /* cannot continue */
-} /* symlook */
+    addstr("\n\n\t"); /* tab out so it looks nice */
+    refresh();
+    for (;;)
+    {
+        int i, nval;
+        getstr(buf);
+        /* numeric choice? */
+        nval = atoi(buf);
+        /* command choice ? */
+        i = 0;
+        for (ptr = items; ptr->desc != 0; ptr++)
+        {
+            if (ptr->attribute != VISIBLE)
+                continue;
+            i++;
+            if (nval == i)
+                break;
+            if (!casecmp(buf, ptr->cmd))
+                break;
+        }
+        if (!ptr->desc)
+            continue; /* no match */
+        switch (ptr->action)
+        {
+        case QUIT:
+            //return void*(0);
+        case IGNORE:
+            refresh();
+            break;
+        case EXECUTE:
+            refresh();
+            system(ptr->act_str);
+            break;
+        case MENU:
+            refresh();
+            (*ptr->act_menu)();
+            break;
+        default:
+            printw("default case,  no action\n");
+            refresh();
+            break;
+        }
+        refresh();
+    }
+}
+int casecmp(char *p, char *q)
+{
+    int pc, qc;
+    for (; *p != 0; p++, q++)
+    {
+        pc = tolower(*p);
+        qc = tolower(*q);
+        if (pc != qc)
+            break;
+    }
+    return pc - qc;
+}

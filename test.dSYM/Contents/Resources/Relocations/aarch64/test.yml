@@ -1,9 +1,11 @@
 ---
 triple:          'arm64-apple-darwin'
-binary-path:     test
+binary-path:     '/Users/iranchoudhury/Documents/lex_yacc_cpp/test'
 relocations:
-  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100003CA8, symSize: 0x18C }
-  - { offsetInCU: 0x4D, offset: 0x4D, size: 0x8, addend: 0x0, symName: _table, symBinAddr: 0x100008000, symSize: 0x0 }
-  - { offsetInCU: 0x8F, offset: 0x8F, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x100003CA8, symSize: 0x18C }
-  - { offsetInCU: 0x10B, offset: 0x10B, size: 0x8, addend: 0x0, symName: _symlook, symObjAddr: 0x18C, symBinAddr: 0x100003E34, symSize: 0xE4 }
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _dump_data, symObjAddr: 0x0, symBinAddr: 0x10000390C, symSize: 0x88 }
+  - { offsetInCU: 0x4D, offset: 0x4D, size: 0x8, addend: 0x0, symName: _menu_runtime, symObjAddr: 0x688, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x73, offset: 0x73, size: 0x8, addend: 0x0, symName: _screen_init, symObjAddr: 0x920, symBinAddr: 0x100008298, symSize: 0x0 }
+  - { offsetInCU: 0x94, offset: 0x94, size: 0x8, addend: 0x0, symName: _file, symBinAddr: 0x100008318, symSize: 0x0 }
+  - { offsetInCU: 0x294, offset: 0x294, size: 0x8, addend: 0x0, symName: _dump_data, symObjAddr: 0x0, symBinAddr: 0x10000390C, symSize: 0x88 }
+  - { offsetInCU: 0x2B8, offset: 0x2B8, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x88, symBinAddr: 0x100003994, symSize: 0x78 }
 ...
